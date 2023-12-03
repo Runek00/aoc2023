@@ -11,22 +11,20 @@ public class Day2 {
     record Game(Long id, List<Map<String, Long>> rounds) {
     }
 
-    static String aoc2(Stream<String> input) {
+    static long aoc2(Stream<String> input) {
         final Map<String, Long> loaded = Map.of("red", 12L, "green", 13L, "blue", 14L);
         return input
                 .map(Day2::lineToGame)
                 .filter(game -> validGame(loaded, game))
-                .map(Game::id)
-                .reduce(0L, Long::sum)
-                .toString();
+                .mapToLong(Game::id)
+                .sum();
     }
 
-    static String aoc2a(Stream<String> input) {
+    static long aoc2a(Stream<String> input) {
         return input
                 .map(Day2::lineToGame)
-                .map(Day2::toSetPower)
-                .reduce(0L, Long::sum)
-                .toString();
+                .mapToLong(Day2::toSetPower)
+                .sum();
     }
 
     private static Long toSetPower(Game game) {

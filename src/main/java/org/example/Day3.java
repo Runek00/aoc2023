@@ -12,11 +12,11 @@ public class Day3 {
     record CheckResult(int newJ, Long partNum, String gearId) {
     }
 
-    static String aoc3(Stream<String> input) {
+    static long aoc3(Stream<String> input) {
         char[][] tab = input
                 .map(String::toCharArray)
                 .toArray(char[][]::new);
-        Long sum = 0L;
+        long sum = 0L;
         Predicate<Character> isSymbol = (c) -> !Character.isDigit(c) && c != '.';
         for (int i = 0; i < tab.length; i++) {
             for (int j = 0; j < tab[0].length; j++) {
@@ -27,10 +27,10 @@ public class Day3 {
                 }
             }
         }
-        return sum.toString();
+        return sum;
     }
 
-    static String aoc3a(Stream<String> input) {
+    static long aoc3a(Stream<String> input) {
         char[][] tab = input
                 .map(String::toCharArray)
                 .toArray(char[][]::new);
@@ -51,11 +51,9 @@ public class Day3 {
         }
         return gearMap.values().stream()
                 .filter(l -> l.size() == 2)
-                .map(l -> l.get(0) * l.get(1))
-                .reduce(0L, Long::sum)
-                .toString();
+                .mapToLong(l -> l.get(0) * l.get(1))
+                .sum();
     }
-
 
     private static CheckResult checkNumber(char[][] tab, int i, int j, Predicate<Character> characterPredicate) {
         long numVal = 0L;
@@ -83,7 +81,6 @@ public class Day3 {
                 if (result != null) return result;
             }
         }
-
         if (j > 0) {
             CheckResult result = getCheckResult(tab, i, j - 1, numEnd, numVal, characterPredicate);
             if (result != null) return result;

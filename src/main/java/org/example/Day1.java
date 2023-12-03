@@ -16,18 +16,16 @@ public class Day1 {
             "eight", '8',
             "nine", '9');
 
-    static String aoc1(Stream<String> input) {
+    static long aoc1(Stream<String> input) {
         return input
-                .map(Day1::getNumber)
-                .reduce(0L, Long::sum)
-                .toString();
+                .mapToLong(Day1::getNumber)
+                .sum();
     }
 
-    static String aoc1a(Stream<String> input) {
+    static long aoc1a(Stream<String> input) {
         return input
-                .map(Day1::getNumberOrWord)
-                .reduce(0L, Long::sum)
-                .toString();
+                .mapToLong(Day1::getNumberOrWord)
+                .sum();
     }
 
     private static Long getNumber(String line) {
