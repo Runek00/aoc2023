@@ -43,19 +43,14 @@ public class Day2 {
         List<Map<String, Long>> rounds = Arrays.stream(lsplit[1].split("; "))
                 .map(roundString -> Arrays.stream(roundString.split(", "))
                         .map(cubeString -> cubeString.split(" "))
-                        .collect(Collectors.toMap(csplit -> csplit[1], csplit -> Long.parseLong(csplit[0]), (a, b) -> b)))
+                        .collect(Collectors.toMap(csplit -> csplit[1], csplit -> Long.parseLong(csplit[0]))))
                 .toList();
         return new Game(id, rounds);
     }
 
     private static boolean validGame(Map<String, Long> loaded, Game game) {
-        for (Map<String, Long> r : game.rounds()) {
-            for (String k : r.keySet()) {
-                if (r.get(k) > loaded.getOrDefault(k, 0L)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return game.rounds().stream()
+                .noneMatch(r -> r.keySet().stream()
+                        .anyMatch(k -> r.get(k) > loaded.getOrDefault(k, 0L)));
     }
 }
