@@ -16,16 +16,18 @@ public class Day4 {
 
     static long aoc4a(Stream<String> input) {
         HashMap<Integer, Long> copyMap = new HashMap<>();
-        return input.
-                mapToLong(line -> {
-                    int cardId = getCardId(line);
-                    int wins = getWinCount(line.split(": ")[1]);
-                    for (int i = cardId + 1; i <= cardId + wins; i++) {
-                        copyMap.put(i, copyMap.getOrDefault(i, 1L) + copyMap.getOrDefault(cardId, 1L));
-                    }
-                    return copyMap.getOrDefault(cardId, 1L);
-                })
+        return input
+                .mapToLong(line -> processLine(line, copyMap))
                 .sum();
+    }
+
+    private static Long processLine(String line, HashMap<Integer, Long> copyMap) {
+        int cardId = getCardId(line);
+        int wins = getWinCount(line.split(": ")[1]);
+        for (int i = cardId + 1; i <= cardId + wins; i++) {
+            copyMap.put(i, copyMap.getOrDefault(i, 1L) + copyMap.getOrDefault(cardId, 1L));
+        }
+        return copyMap.getOrDefault(cardId, 1L);
     }
 
     private static int getCardId(String line) {
