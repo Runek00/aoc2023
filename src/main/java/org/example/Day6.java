@@ -15,6 +15,10 @@ public class Day6 {
                 .reduce(1L, (a, b) -> a * b);
     }
 
+    static long aoc6a(String input) {
+        return aoc6(input.replace(" ", ""));
+    }
+
     private static long getMargin(int i, long[] times, long[] distances) {
         double sqdel = Math.sqrt(times[i] * times[i] - (4 * distances[i]));
         long t1 = (long) Math.ceil((times[i] - sqdel) / 2);
