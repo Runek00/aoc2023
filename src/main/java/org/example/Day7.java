@@ -15,10 +15,6 @@ public class Day7 {
         private final int[] type;
         private final long bid;
 
-        Hand(String[] line) {
-            this(line, false);
-        }
-
         Hand(String[] line, boolean jokers) {
             this.line = line[0];
             this.bid = Long.parseLong(line[1]);
