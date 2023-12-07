@@ -7,12 +7,13 @@ import java.util.stream.Stream;
 
 public class Day7 {
 
+    private final static Map<Character, Integer> strMap = new HashMap<>();
+
     static class Hand implements Comparable<Hand> {
 
         private final String line;
         private final int[] type;
         private final long bid;
-        private final Map<Character, Integer> strMap = new HashMap<>();
 
         Hand(String[] line) {
             this.line = line[0];
@@ -24,11 +25,6 @@ public class Day7 {
             }
             freq.values().forEach(v -> type[v]++);
 
-            int i = 13;
-            for (String s : "A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2".split(", ")) {
-                strMap.put(s.charAt(0), i);
-                i--;
-            }
         }
 
         @Override
@@ -39,9 +35,9 @@ public class Day7 {
                 }
             }
             for (int i = 0; i < 5; i++) {
-                Integer c1 = strMap.get(line.charAt(i));
-                Integer c2 = strMap.get(o.line.charAt(i));
-                if (!c1.equals(c2)) {
+                int c1 = strMap.get(line.charAt(i));
+                int c2 = strMap.get(o.line.charAt(i));
+                if (c1 != c2) {
                     return Integer.compare(c1, c2);
                 }
             }
@@ -50,13 +46,19 @@ public class Day7 {
     }
 
     static long aoc7(Stream<String> input) {
+        int n = 0;
+        for (String s : "A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2".split(", ")) {
+            strMap.put(s.charAt(0), n);
+            n--;
+        }
         List<Hand> list = input
                 .map(line -> new Hand(line.split(" ")))
                 .sorted()
                 .toList();
         long out = 0L;
         for (int i = 0; i < list.size(); i++) {
-            out += ((i + 1) * list.get(i).bid);
+            int rank = i+1;
+            out += (rank * list.get(i).bid);
         }
         return out;
     }
