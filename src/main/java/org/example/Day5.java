@@ -83,7 +83,7 @@ public class Day5 {
         long end = firstRange.end();
         while (!byStarts.isEmpty()) {
             Range newRange = byStarts.pollFirstEntry().getValue();
-            if (newRange.start() < end) {
+            if (newRange.start() <= end) {
                 end = Math.max(end, newRange.end());
             } else {
                 output.add(new Range(start, end));
