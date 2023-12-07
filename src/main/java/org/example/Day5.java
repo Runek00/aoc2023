@@ -20,6 +20,48 @@ public class Day5 {
     static long aoc5a(String input) {
         String[] splinput = input.split("\r\n\r\n");
         String[] seedNums = splinput[0].split(": ")[1].split(" ");
+        List<Range> ranges = new ArrayList<>();
+        for (int i = 0; i < seedNums.length; i += 2) {
+            ranges.add(new Range(Long.parseLong(seedNums[i]), Long.parseLong(seedNums[i]) + Long.parseLong(seedNums[i + 1])));
+        }
+        ranges = normalizeRanges(ranges);
+        List<RangesMapper> transformers = getTransformers(splinput);
+        for (RangesMapper transformer : transformers) {
+            ranges = mapRanges(ranges, transformer);
+        }
+        return ranges.get(0).start();
+    }
+
+    static List<Range> mapRanges(List<Range> ranges, RangesMapper mappers) {
+        List<Range> output = new ArrayList<>();
+        for (Range range : ranges) {
+            for (RangeMapper mapRange : mappers.ranges()) {
+                if (mapRange.inRange(range.start())) {
+                    if (mapRange.inRange(range.end())) {
+                        output.add(new Range(range.start() + mapRange.diff(), range.end() + mapRange.diff()));
+                        range = null;
+                        break;
+                    } else {
+                        output.add(new Range(range.start() + mapRange.diff(), mapRange.targetEnd()));
+                        range = new Range(mapRange.sourceEnd(), range.end());
+                    }
+                } else if (mapRange.inRange(range.end())) {
+                    output.add(new Range(range.start(), mapRange.sourceStart()));
+                    output.add(new Range(mapRange.targetStart(), range.end() + mapRange.diff()));
+                    range = null;
+                    break;
+                }
+            }
+            if (range != null) {
+                output.add(range);
+            }
+        }
+        return normalizeRanges(output);
+    }
+
+    static long aoc5aOld(String input) {
+        String[] splinput = input.split("\r\n\r\n");
+        String[] seedNums = splinput[0].split(": ")[1].split(" ");
         long cand = Long.MAX_VALUE;
         List<Range> ranges = new ArrayList<>();
         for (int i = 0; i < seedNums.length; i += 2) {
@@ -74,6 +116,7 @@ public class Day5 {
                 .mapToObj(i -> splinput[i].split(":\r\n")[1])
                 .map(mapString -> Arrays.stream(mapString.split("\r\n"))
                         .map(s -> new RangeMapper(s.split(" ")))
+                        .sorted(Comparator.comparing(RangeMapper::sourceStart))
                         .toList())
                 .map(RangesMapper::new)
                 .toList();
@@ -108,12 +151,24 @@ public class Day5 {
             this(targetStart, sourceStart, length, targetStart - sourceStart);
         }
 
+        boolean inRange(long point) {
+            return point >= sourceStart && point < sourceEnd();
+        }
+
         long map(long input) {
-            if (input >= sourceStart && input < sourceStart + length) {
+            if (inRange(input)) {
                 return input + diff;
             } else {
                 return input;
             }
+        }
+
+        public long sourceEnd() {
+            return sourceStart + length;
+        }
+
+        public long targetEnd() {
+            return targetStart + length;
         }
     }
 }
