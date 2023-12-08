@@ -19,6 +19,7 @@ import static org.example.Day6.aoc6;
 import static org.example.Day6.aoc6a;
 import static org.example.Day7.aoc7;
 import static org.example.Day7.aoc7a;
+import static org.example.Day8.aoc8;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -36,6 +37,7 @@ public class Main {
         System.out.println(aoc6a(Files.readString(Path.of(input6))));
         System.out.println(aoc7(fileReader(input7)));
         System.out.println(aoc7a(fileReader(input7)));
+        System.out.println(aoc8(fileReader(input8)));
     }
 
     private static final String test = "src/main/java/org/example/inputs/testInput";
@@ -46,6 +48,7 @@ public class Main {
     private static final String input5 = "src/main/java/org/example/inputs/day5input";
     private static final String input6 = "src/main/java/org/example/inputs/day6input";
     private static final String input7 = "src/main/java/org/example/inputs/day7input";
+    private static final String input8 = "src/main/java/org/example/inputs/day8input";
 
     static Stream<String> fileReader(String filePath) throws IOException {
         return Files.lines(Path.of(filePath));
