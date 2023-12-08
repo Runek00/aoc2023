@@ -20,6 +20,7 @@ import static org.example.Day6.aoc6a;
 import static org.example.Day7.aoc7;
 import static org.example.Day7.aoc7a;
 import static org.example.Day8.aoc8;
+import static org.example.Day8.aoc8a;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -38,6 +39,7 @@ public class Main {
         System.out.println(aoc7(fileReader(input7)));
         System.out.println(aoc7a(fileReader(input7)));
         System.out.println(aoc8(fileReader(input8)));
+        System.out.println(aoc8a(fileReader(input8)));
     }
 
     private static final String test = "src/main/java/org/example/inputs/testInput";
