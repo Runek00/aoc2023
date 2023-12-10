@@ -71,7 +71,7 @@ public class Day10 {
                         int finalJ = j;
                         List<Character> froms = Arrays.stream(neighbors)
                                 .filter(step -> step.now().x() != finalI)
-                                .map(step -> getDirectionDiff(finalI, finalJ, step.now().x(), step.now().y()))
+                                .map(Step::from)
                                 .filter(d -> d == 'N' || d == 'S')
                                 .toList();
                         if (froms.size() == 1) {
@@ -112,23 +112,6 @@ public class Day10 {
                 .map(step -> nextStep(step, tab))
                 .filter(Objects::nonNull)
                 .toArray(Step[]::new);
-    }
-
-    private static char getDirectionDiff(int finalI, int finalJ, int x, int y) {
-        if (finalI == x) {
-            if (finalJ - y == 1) {
-                return 'W';
-            } else if (finalJ - y == -1) {
-                return 'E';
-            }
-        } else if (finalJ == y) {
-            if (finalI - x == 1) {
-                return 'N';
-            } else if (finalI - x == -1) {
-                return 'S';
-            }
-        }
-        return 'X';
     }
 
     private static Step nextStep(Step step, char[][] tab) {
