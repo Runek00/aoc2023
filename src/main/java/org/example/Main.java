@@ -10,6 +10,7 @@ import static org.example.Day1.aoc1a;
 import static org.example.Day10.aoc10;
 import static org.example.Day10.aoc10a;
 import static org.example.Day11.aoc11;
+import static org.example.Day11.aoc11a;
 import static org.example.Day2.aoc2;
 import static org.example.Day2.aoc2a;
 import static org.example.Day3.aoc3;
@@ -50,6 +51,7 @@ public class Main {
         System.out.println(aoc10(fileReader(input10)));
         System.out.println(aoc10a(fileReader(input10)));
         System.out.println(aoc11(fileReader(input11)));
+        System.out.println(aoc11a(fileReader(input11)));
     }
 
     private static final String test = "src/main/java/org/example/inputs/testInput";
