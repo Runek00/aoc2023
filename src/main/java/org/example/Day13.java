@@ -1,11 +1,14 @@
 package org.example;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 public class Day13 {
 
     record CompResult(boolean smudge, boolean madeit) {
     }
+
+    record SamesiesInput(char[][]tab, int a, int b, boolean smudge){}
 
     public static long aoc13(String input) {
         return Arrays.stream(input.split("\r\n\r\n"))
@@ -26,23 +29,23 @@ public class Day13 {
     }
 
     private static long getResult(char[][] part, boolean smudge) {
-        long count = 100 * countMirroredRows(part, smudge);
+        long count = 100 * countMirroredLines(part, smudge, part.length, Day13::sameRows);
         if (count == 0L) {
-            count = countMirroredColumns(part, smudge);
+            count = countMirroredLines(part, smudge, part[0].length, Day13::sameColumns);
         }
         return count;
     }
 
-    private static long countMirroredRows(char[][] part, boolean initialSmudge) {
+    private static long countMirroredLines(char[][] part, boolean initialSmudge, int maxLength, Function<SamesiesInput, CompResult> comparing) {
         FindStart:
-        for (int i = 0; i < part.length - 1; i++) {
-            CompResult compResult = sameRows(part, i, i + 1, initialSmudge);
+        for (int i = 0; i < maxLength - 1; i++) {
+            CompResult compResult = comparing.apply(new SamesiesInput(part, i, i + 1, initialSmudge));
             boolean smudge = compResult.smudge();
             if (compResult.madeit()) {
                 int a = i - 1;
                 int b = i + 2;
-                while (a >= 0 && b < part.length) {
-                    compResult = sameRows(part, a, b, smudge);
+                while (a >= 0 && b < maxLength) {
+                    compResult = comparing.apply(new SamesiesInput(part, a, b, smudge));
                     smudge = compResult.smudge();
                     if (!compResult.madeit()) {
                         continue FindStart;
@@ -58,34 +61,10 @@ public class Day13 {
         return 0L;
     }
 
-    private static long countMirroredColumns(char[][] part, boolean initialSmudge) {
-        FindStart:
-        for (int i = 0; i < part[0].length - 1; i++) {
-            CompResult compResult = sameColumns(part, i, i + 1, initialSmudge);
-            boolean smudge = compResult.smudge();
-            if (compResult.madeit()) {
-                int a = i - 1;
-                int b = i + 2;
-                while (a >= 0 && b < part[0].length) {
-                    compResult = sameColumns(part, a, b, smudge);
-                    smudge = compResult.smudge();
-                    if (!compResult.madeit()) {
-                        continue FindStart;
-                    }
-                    a--;
-                    b++;
-                }
-                if (!smudge) {
-                    return (long) i + 1;
-                }
-            }
-        }
-        return 0L;
-    }
-
-    private static CompResult sameRows(char[][] part, int a, int b, boolean smudge) {
-        for (int i = 0; i < part[0].length; i++) {
-            if (part[a][i] != part[b][i]) {
+    private static CompResult sameRows(SamesiesInput params) {
+        boolean smudge = params.smudge();
+        for (int i = 0; i < params.tab()[0].length; i++) {
+            if (params.tab()[params.a()][i] != params.tab()[params.b()][i]) {
                 if (!smudge) {
                     return new CompResult(false, false);
                 } else {
@@ -96,9 +75,10 @@ public class Day13 {
         return new CompResult(smudge, true);
     }
 
-    private static CompResult sameColumns(char[][] part, int a, int b, boolean smudge) {
-        for (char[] chars : part) {
-            if (chars[a] != chars[b]) {
+    private static CompResult sameColumns(SamesiesInput params) {
+        boolean smudge = params.smudge();
+        for (char[] chars : params.tab()) {
+            if (chars[params.a()] != chars[params.b()]) {
                 if (!smudge) {
                     return new CompResult(false, false);
                 } else {
