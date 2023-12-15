@@ -17,6 +17,7 @@ import static org.example.Day13.aoc13a;
 import static org.example.Day14.aoc14;
 import static org.example.Day14.aoc14a;
 import static org.example.Day15.aoc15;
+import static org.example.Day15.aoc15a;
 import static org.example.Day2.aoc2;
 import static org.example.Day2.aoc2a;
 import static org.example.Day3.aoc3;
@@ -65,6 +66,7 @@ public class Main {
         System.out.println(aoc14(fileReader(input14)));
         System.out.println(aoc14a(fileReader(input14)));
         System.out.println(aoc15(Files.readString(Path.of(input15))));
+        System.out.println(aoc15a(Files.readString(Path.of(input15))));
     }
 
     private static final String test = "src/main/java/org/example/inputs/testInput";
