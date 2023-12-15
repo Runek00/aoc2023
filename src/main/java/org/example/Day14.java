@@ -1,6 +1,9 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -26,7 +29,21 @@ public class Day14 {
     }
 
     private static char[][] cycles(char[][] tab, long cycleCount) {
+        Set<String> cache = new HashSet<>();
+        long repeatStart = 0;
         for (long i = 0; i < cycleCount; i++) {
+            String strVersion = Arrays.deepToString(tab);
+            if (cache.contains(strVersion)) {
+                cache = new HashSet<>();
+                cache.add(strVersion);
+                if (repeatStart == 0) {
+                    repeatStart = i;
+                } else {
+                    return cycles(tab, (cycleCount - i) % (i - repeatStart));
+                }
+            } else {
+                cache.add(strVersion);
+            }
             tab = cycle(tab);
         }
         return tab;
@@ -64,9 +81,7 @@ public class Day14 {
         char[][] out = new char[tab[0].length][tab.length];
         IntStream.range(0, tab.length * tab[0].length)
                 .parallel()
-                .forEach(n -> {
-                    out[n % tab[0].length][tab.length - 1 - (n / tab[0].length)] = tab[n / tab[0].length][n % tab[0].length];
-                });
+                .forEach(n -> out[n % tab[0].length][tab.length - 1 - (n / tab[0].length)] = tab[n / tab[0].length][n % tab[0].length]);
         return out;
     }
 

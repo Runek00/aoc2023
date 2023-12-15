@@ -62,7 +62,7 @@ public class Main {
         System.out.println(aoc13(Files.readString(Path.of(input13))));
         System.out.println(aoc13a(Files.readString(Path.of(input13))));
         System.out.println(aoc14(fileReader(input14)));
-        System.out.println(aoc14a(fileReader(test)));
+        System.out.println(aoc14a(fileReader(input14)));
     }
 
     private static final String test = "src/main/java/org/example/inputs/testInput";
