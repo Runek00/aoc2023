@@ -99,15 +99,12 @@ public class Day14 {
         int rollDist = 0;
         for (int i = 0; i < vals.length; i++) {
             switch (vals[i]) {
-                case '.':
-                    rollDist++;
-                    break;
-                case '#':
-                    rollDist = 0;
-                    break;
-                case 'O':
+                case '.' -> rollDist++;
+                case '#' -> rollDist = 0;
+                case 'O' -> {
                     vals[i] = '.';
                     vals[i - rollDist] = 'O';
+                }
             }
         }
         return vals;
