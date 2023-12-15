@@ -16,6 +16,7 @@ import static org.example.Day13.aoc13;
 import static org.example.Day13.aoc13a;
 import static org.example.Day14.aoc14;
 import static org.example.Day14.aoc14a;
+import static org.example.Day15.aoc15;
 import static org.example.Day2.aoc2;
 import static org.example.Day2.aoc2a;
 import static org.example.Day3.aoc3;
@@ -63,6 +64,7 @@ public class Main {
         System.out.println(aoc13a(Files.readString(Path.of(input13))));
         System.out.println(aoc14(fileReader(input14)));
         System.out.println(aoc14a(fileReader(input14)));
+        System.out.println(aoc15(Files.readString(Path.of(input15))));
     }
 
     private static final String test = "src/main/java/org/example/inputs/testInput";
@@ -80,6 +82,7 @@ public class Main {
     private static final String input12 = "src/main/java/org/example/inputs/day12input";
     private static final String input13 = "src/main/java/org/example/inputs/day13input";
     private static final String input14 = "src/main/java/org/example/inputs/day14input";
+    private static final String input15 = "src/main/java/org/example/inputs/day15input";
 
     static Stream<String> fileReader(String filePath) throws IOException {
         return Files.lines(Path.of(filePath));
