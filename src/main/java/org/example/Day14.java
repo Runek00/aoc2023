@@ -89,8 +89,7 @@ public class Day14 {
         return IntStream.range(0, tab.length)
                 .boxed()
                 .parallel()
-                .map(i -> new Row(i, tab[i]))
-                .map(row -> new Row(row.idx(), tilt(row.vals())))
+                .map(i -> new Row(i, tilt(tab[i])))
                 .sorted(Comparator.comparing(Row::idx))
                 .map(Row::vals)
                 .toArray(char[][]::new);
