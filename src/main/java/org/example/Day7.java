@@ -26,7 +26,7 @@ public class Day7 {
             if (jokers) {
                 freq.keySet().stream()
                         .filter(k -> k != 'J')
-                        .map(k -> freq.get(k))
+                        .map(freq::get)
                         .forEach(v -> type[v]++);
                 if (freq.containsKey('J')) {
                     if (freq.get('J') == 5) {

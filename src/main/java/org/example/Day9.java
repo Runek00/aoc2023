@@ -46,6 +46,6 @@ public class Day9 {
         if(list == null) {
             return true;
         }
-        return list.get(0) == 0L && new HashSet<>(list).size() == 1;
+        return list.getFirst() == 0L && new HashSet<>(list).size() == 1;
     }
 }

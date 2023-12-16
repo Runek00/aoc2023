@@ -35,7 +35,7 @@ public class Day11 {
                 .map(Day11::toCharacterList)
                 .toList();
 
-        for (int i = listTab.get(0).size() - 1; i >= 0; i--) {
+        for (int i = listTab.getFirst().size() - 1; i >= 0; i--) {
             int finalI = i;
             if (listTab.stream().map(list -> list.get(finalI)).noneMatch(character -> character == '#')) {
                 listTab.forEach(list -> list.set(finalI, 'X'));
@@ -47,7 +47,7 @@ public class Day11 {
     private static Set<Point> getGalaxies(List<List<Character>> listTab) {
         Set<Point> galaxies = new HashSet<>();
         for (int i = 0; i < listTab.size(); i++) {
-            for (int j = 0; j < listTab.get(0).size(); j++) {
+            for (int j = 0; j < listTab.getFirst().size(); j++) {
                 if (listTab.get(i).get(j) == '#') {
                     galaxies.add(new Point(i, j));
                 }

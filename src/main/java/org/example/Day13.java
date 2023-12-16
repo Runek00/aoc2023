@@ -3,6 +3,8 @@ package org.example;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import static org.example.Utils.streamTo2DCharArray;
+
 public class Day13 {
 
     record CompResult(boolean smudge, boolean madeit) {
@@ -12,18 +14,14 @@ public class Day13 {
 
     public static long aoc13(String input) {
         return Arrays.stream(input.split("\r\n\r\n"))
-                .map(part -> Arrays.stream(part.split("\r\n"))
-                        .map(String::toCharArray)
-                        .toArray(char[][]::new))
+                .map(part -> streamTo2DCharArray(Arrays.stream(part.split("\r\n"))))
                 .mapToLong(part -> getResult(part, false))
                 .sum();
     }
 
     public static long aoc13a(String input) {
         return Arrays.stream(input.split("\r\n\r\n"))
-                .map(part -> Arrays.stream(part.split("\r\n"))
-                        .map(String::toCharArray)
-                        .toArray(char[][]::new))
+                .map(part -> streamTo2DCharArray(Arrays.stream(part.split("\r\n"))))
                 .mapToLong(part -> getResult(part, true))
                 .sum();
     }

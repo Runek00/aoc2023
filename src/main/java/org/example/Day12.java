@@ -63,7 +63,7 @@ public class Day12 {
 
         long orderSum = orderList.stream().mapToLong(l -> l).sum();
         long output = 0L;
-        long l = orderList.get(0);
+        long l = orderList.getFirst();
         for (int i = 0; i < row.length() - orderSum + l - 1; i++) {
             if (row.charAt(i) == '#') {
                 break;

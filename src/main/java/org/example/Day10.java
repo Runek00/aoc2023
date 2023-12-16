@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.example.Utils.streamTo2DCharArray;
+
 public class Day10 {
 
     record Point(int x, int y) {
@@ -16,9 +18,7 @@ public class Day10 {
     }
 
     public static long aoc10(Stream<String> input) {
-        char[][] tab = input
-                .map(String::toCharArray)
-                .toArray(char[][]::new);
+        char[][] tab = streamTo2DCharArray(input);
         Point start = findStart(tab);
         Step[] steps = findFirstSteps(start, tab);
         if (steps.length != 2) {
@@ -35,9 +35,7 @@ public class Day10 {
     }
 
     public static long aoc10a(Stream<String> input) {
-        char[][] tab = input
-                .map(String::toCharArray)
-                .toArray(char[][]::new);
+        char[][] tab = streamTo2DCharArray(input);
         char[][] tab2 = new char[tab.length][tab[0].length];
         for (char[] cTab : tab2) {
             Arrays.fill(cTab, 'O');
@@ -76,12 +74,12 @@ public class Day10 {
                                 .toList();
                         if (froms.size() == 1) {
                             if (from != 'X') {
-                                if (from != froms.get(0)) {
+                                if (from != froms.getFirst()) {
                                     inside = !inside;
                                 }
                                 from = 'X';
                             } else {
-                                from = froms.get(0);
+                                from = froms.getFirst();
                             }
                         } else if (froms.size() == 2) {
                             inside = !inside;

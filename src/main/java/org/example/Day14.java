@@ -7,11 +7,11 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.example.Utils.streamTo2DCharArray;
+
 public class Day14 {
     public static long aoc14(Stream<String> input) {
-        char[][] tab = input
-                .map(String::toCharArray)
-                .toArray(char[][]::new);
+        char[][] tab = streamTo2DCharArray(input);
         for (int i = 0; i < 3; i++) {
             tab = rotateRight(tab);
         }
@@ -21,9 +21,7 @@ public class Day14 {
     }
 
     public static long aoc14a(Stream<String> input) {
-        char[][] tab = input
-                .map(String::toCharArray)
-                .toArray(char[][]::new);
+        char[][] tab = streamTo2DCharArray(input);
         tab = cycles(tab, 1_000_000_000L);
         return getLoad(tab);
     }

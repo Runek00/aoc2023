@@ -1,9 +1,6 @@
 package org.example;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 import static org.example.Day1.aoc1;
 import static org.example.Day1.aoc1a;
@@ -34,40 +31,43 @@ import static org.example.Day8.aoc8;
 import static org.example.Day8.aoc8a;
 import static org.example.Day9.aoc9;
 import static org.example.Day9.aoc9a;
+import static org.example.Utils.fileToStream;
+import static org.example.Utils.fileToString;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        System.out.println(aoc1(fileReader(input1)));
-        System.out.println(aoc1a(fileReader(input1)));
-        System.out.println(aoc2(fileReader(input2)));
-        System.out.println(aoc2a(fileReader(input2)));
-        System.out.println(aoc3(fileReader(input3)));
-        System.out.println(aoc3a(fileReader(input3)));
-        System.out.println(aoc4(fileReader(input4)));
-        System.out.println(aoc4a(fileReader(input4)));
-        System.out.println(aoc5(Files.readString(Path.of(input5))));
-        System.out.println(aoc5a(Files.readString(Path.of(input5))));
-        System.out.println(aoc6(Files.readString(Path.of(input6))));
-        System.out.println(aoc6a(Files.readString(Path.of(input6))));
-        System.out.println(aoc7(fileReader(input7)));
-        System.out.println(aoc7a(fileReader(input7)));
-        System.out.println(aoc8(fileReader(input8)));
-        System.out.println(aoc8a(fileReader(input8)));
-        System.out.println(aoc9(fileReader(input9)));
-        System.out.println(aoc9a(fileReader(input9)));
-        System.out.println(aoc10(fileReader(input10)));
-        System.out.println(aoc10a(fileReader(input10)));
-        System.out.println(aoc11(fileReader(input11)));
-        System.out.println(aoc11a(fileReader(input11)));
-        System.out.println(aoc12(fileReader(input12)));
+        System.out.println(aoc1(fileToStream(input1)));
+        System.out.println(aoc1a(fileToStream(input1)));
+        System.out.println(aoc2(fileToStream(input2)));
+        System.out.println(aoc2a(fileToStream(input2)));
+        System.out.println(aoc3(fileToStream(input3)));
+        System.out.println(aoc3a(fileToStream(input3)));
+        System.out.println(aoc4(fileToStream(input4)));
+        System.out.println(aoc4a(fileToStream(input4)));
+        System.out.println(aoc5(fileToString(input5)));
+        System.out.println(aoc5a(fileToString(input5)));
+        System.out.println(aoc6(fileToString(input6)));
+        System.out.println(aoc6a(fileToString(input6)));
+        System.out.println(aoc7(fileToStream(input7)));
+        System.out.println(aoc7a(fileToStream(input7)));
+        System.out.println(aoc8(fileToStream(input8)));
+        System.out.println(aoc8a(fileToStream(input8)));
+        System.out.println(aoc9(fileToStream(input9)));
+        System.out.println(aoc9a(fileToStream(input9)));
+        System.out.println(aoc10(fileToStream(input10)));
+        System.out.println(aoc10a(fileToStream(input10)));
+        System.out.println(aoc11(fileToStream(input11)));
+        System.out.println(aoc11a(fileToStream(input11)));
+        System.out.println(aoc12(fileToStream(input12)));
         // System.out.println(aoc12a(fileReader(input12)));
-        System.out.println(aoc13(Files.readString(Path.of(input13))));
-        System.out.println(aoc13a(Files.readString(Path.of(input13))));
-        System.out.println(aoc14(fileReader(input14)));
-        System.out.println(aoc14a(fileReader(input14)));
-        System.out.println(aoc15(Files.readString(Path.of(input15))));
-        System.out.println(aoc15a(Files.readString(Path.of(input15))));
+        System.out.println(aoc13(fileToString(input13)));
+        System.out.println(aoc13a(fileToString(input13)));
+        System.out.println(aoc14(fileToStream(input14)));
+        System.out.println(aoc14a(fileToStream(input14)));
+        System.out.println(aoc15(fileToString(input15)));
+        System.out.println(aoc15a(fileToString(input15)));
     }
+
 
     private static final String test = "src/main/java/org/example/inputs/testInput";
     private static final String input1 = "src/main/java/org/example/inputs/day1Input";
@@ -86,7 +86,4 @@ public class Main {
     private static final String input14 = "src/main/java/org/example/inputs/day14input";
     private static final String input15 = "src/main/java/org/example/inputs/day15input";
 
-    static Stream<String> fileReader(String filePath) throws IOException {
-        return Files.lines(Path.of(filePath));
-    }
 }

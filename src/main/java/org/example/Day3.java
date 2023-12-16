@@ -7,15 +7,15 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static org.example.Utils.streamTo2DCharArray;
+
 public class Day3 {
 
     record CheckResult(int newJ, Long partNum, String gearId) {
     }
 
     static long aoc3(Stream<String> input) {
-        char[][] tab = input
-                .map(String::toCharArray)
-                .toArray(char[][]::new);
+        char[][] tab = streamTo2DCharArray(input);
         long sum = 0L;
         Predicate<Character> isSymbol = (c) -> !Character.isDigit(c) && c != '.';
         for (int i = 0; i < tab.length; i++) {
@@ -31,9 +31,7 @@ public class Day3 {
     }
 
     static long aoc3a(Stream<String> input) {
-        char[][] tab = input
-                .map(String::toCharArray)
-                .toArray(char[][]::new);
+        char[][] tab = streamTo2DCharArray(input);
         Predicate<Character> isGear = (c) -> c == '*';
         Map<String, List<Long>> gearMap = new HashMap<>();
         for (int i = 0; i < tab.length; i++) {
@@ -51,7 +49,7 @@ public class Day3 {
         }
         return gearMap.values().stream()
                 .filter(l -> l.size() == 2)
-                .mapToLong(l -> l.get(0) * l.get(1))
+                .mapToLong(l -> l.getFirst() * l.get(1))
                 .sum();
     }
 
