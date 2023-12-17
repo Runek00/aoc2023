@@ -22,10 +22,14 @@ public class Utils {
     }
 
     record Point(int a, int b) {
+
+        public Point minus(Direction dir) {
+            return new Point(a - dir.change().a(), b - dir.change().b());
+        }
     }
 
-    record Step(Point p, char from) {
-        Step(int a, int b, char from) {
+    record Step(Point p, Direction from) {
+        Step(int a, int b, Direction from) {
             this(new Point(a, b), from);
         }
 
@@ -35,6 +39,24 @@ public class Utils {
 
         int b() {
             return p.b();
+        }
+    }
+
+    enum Direction {
+        N(-1, 0),
+        S(1, 0),
+        E(0, 1),
+        W(0, -1),
+        ;
+
+        private final Point change;
+
+        Direction(int a, int b) {
+            this.change = new Point(a, b);
+        }
+
+        public Point change() {
+            return change;
         }
     }
 

@@ -7,13 +7,14 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.example.Utils.Direction.*;
 import static org.example.Utils.streamTo2DCharArray;
 
 public class Day16 {
 
 
     public static int aoc16(Stream<String> input) {
-        Step entryPoint = new Step(0, 0, 'W');
+        Step entryPoint = new Step(0, 0, W);
         char[][] tab = streamTo2DCharArray(input);
         return energizedFromPoint(entryPoint, tab);
     }
@@ -24,9 +25,9 @@ public class Day16 {
         int out1 = IntStream.range(0, tab.length).parallel()
                 .map(i -> {
                     int output = 0;
-                    Step entryPoint = new Step(i, 0, 'W');
+                    Step entryPoint = new Step(i, 0, W);
                     output = Math.max(output, energizedFromPoint(entryPoint, tab));
-                    entryPoint = new Step(i, tab[0].length - 1, 'E');
+                    entryPoint = new Step(i, tab[0].length - 1, E);
                     output = Math.max(output, energizedFromPoint(entryPoint, tab));
                     return output;
                 })
@@ -35,9 +36,9 @@ public class Day16 {
         int out2 = IntStream.range(0, tab[0].length).parallel()
                 .map(i -> {
                     int output = 0;
-                    Step entryPoint = new Step(0, i, 'N');
+                    Step entryPoint = new Step(0, i, N);
                     output = Math.max(output, energizedFromPoint(entryPoint, tab));
-                    entryPoint = new Step(tab.length - 1, i, 'S');
+                    entryPoint = new Step(tab.length - 1, i, S);
                     output = Math.max(output, energizedFromPoint(entryPoint, tab));
                     return output;
                 })
@@ -76,37 +77,33 @@ public class Day16 {
 
     private static List<Step> onMirror(Step step) {
         return switch (step.from()) {
-            case 'E' -> List.of(new Step(step.a() + 1, step.b(), 'N'));
-            case 'W' -> List.of(new Step(step.a() - 1, step.b(), 'S'));
-            case 'N' -> List.of(new Step(step.a(), step.b() - 1, 'E'));
-            case 'S' -> List.of(new Step(step.a(), step.b() + 1, 'W'));
-            default -> throw new IllegalStateException("Unexpected value: " + step.from());
+            case E -> List.of(new Step(step.p().minus(N), N));
+            case W -> List.of(new Step(step.p().minus(S), S));
+            case N -> List.of(new Step(step.p().minus(E), E));
+            case S -> List.of(new Step(step.p().minus(W), W));
         };
     }
 
     private static List<Step> onBackMirror(Step step) {
         return switch (step.from()) {
-            case 'W' -> List.of(new Step(step.a() + 1, step.b(), 'N'));
-            case 'E' -> List.of(new Step(step.a() - 1, step.b(), 'S'));
-            case 'S' -> List.of(new Step(step.a(), step.b() - 1, 'E'));
-            case 'N' -> List.of(new Step(step.a(), step.b() + 1, 'W'));
-            default -> throw new IllegalStateException("Unexpected value: " + step.from());
+            case W -> List.of(new Step(step.p().minus(N), N));
+            case E -> List.of(new Step(step.p().minus(S), S));
+            case S -> List.of(new Step(step.p().minus(E), E));
+            case N -> List.of(new Step(step.p().minus(W), W));
         };
     }
 
     private static List<Step> onVSplitter(Step step) {
         return switch (step.from()) {
-            case 'E', 'W' -> List.of(new Step(step.a() + 1, step.b(), 'N'), new Step(step.a() - 1, step.b(), 'S'));
-            case 'N', 'S' -> onEmpty(step);
-            default -> throw new IllegalStateException("Unexpected value: " + step.from());
+            case E, W -> List.of(new Step(step.p().minus(N), N), new Step(step.p().minus(S), S));
+            case N, S -> onEmpty(step);
         };
     }
 
     private static List<Step> onHSplitter(Step step) {
         return switch (step.from()) {
-            case 'E', 'W' -> onEmpty(step);
-            case 'N', 'S' -> List.of(new Step(step.a(), step.b() - 1, 'E'), new Step(step.a(), step.b() + 1, 'W'));
-            default -> throw new IllegalStateException("Unexpected value: " + step.from());
+            case E, W -> onEmpty(step);
+            case N, S -> List.of(new Step(step.p().minus(E), E), new Step(step.p().minus(W), W));
         };
     }
 
@@ -123,11 +120,10 @@ public class Day16 {
 
     private static List<Step> onEmpty(Step step) {
         return switch (step.from()) {
-            case 'N' -> List.of(new Step(step.a() + 1, step.b(), 'N'));
-            case 'S' -> List.of(new Step(step.a() - 1, step.b(), 'S'));
-            case 'E' -> List.of(new Step(step.a(), step.b() - 1, 'E'));
-            case 'W' -> List.of(new Step(step.a(), step.b() + 1, 'W'));
-            default -> throw new IllegalStateException("Unexpected value: " + step.from());
+            case N -> List.of(new Step(step.p().minus(N), N));
+            case S -> List.of(new Step(step.p().minus(S), S));
+            case E -> List.of(new Step(step.p().minus(E), E));
+            case W -> List.of(new Step(step.p().minus(W), W));
         };
     }
 
