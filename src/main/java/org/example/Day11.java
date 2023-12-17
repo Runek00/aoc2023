@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.Utils.Point;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,8 +10,6 @@ import java.util.stream.Stream;
 
 public class Day11 {
 
-    record Point(long x, long y) {
-    }
 
     public static long aoc11(Stream<String> input) {
         List<List<Character>> listTab = getMarkedLists(input);
@@ -61,10 +61,10 @@ public class Day11 {
                 .filter(gal -> !gal.equals(g))
                 .map(gal -> {
                     long len = 0;
-                    int xStart = (int)(Math.min(g.x(), gal.x()));
-                    int xEnd = (int)(Math.max(g.x(), gal.x()));
-                    int yStart = (int)(Math.min(g.y(), gal.y()));
-                    int yEnd = (int)(Math.max(g.y(), gal.y()));
+                    int xStart = Math.min(g.a(), gal.a());
+                    int xEnd = Math.max(g.a(), gal.a());
+                    int yStart = Math.min(g.b(), gal.b());
+                    int yEnd = Math.max(g.b(), gal.b());
                     for (int i = xStart + 1; i <= xEnd; i++) {
                         if(listTab.get(i).get(yStart) == 'X') {
                             len += factor;

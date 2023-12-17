@@ -21,5 +21,21 @@ public class Utils {
                 .toArray(char[][]::new);
     }
 
+    record Point(int a, int b) {
+    }
+
+    record Step(Point p, char from) {
+        Step(int a, int b, char from) {
+            this(new Point(a, b), from);
+        }
+
+        int a() {
+            return p.a();
+        }
+
+        int b() {
+            return p.b();
+        }
+    }
 
 }

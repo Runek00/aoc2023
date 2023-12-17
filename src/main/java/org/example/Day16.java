@@ -1,5 +1,8 @@
 package org.example;
 
+import org.example.Utils.Point;
+import org.example.Utils.Step;
+
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -8,22 +11,6 @@ import static org.example.Utils.streamTo2DCharArray;
 
 public class Day16 {
 
-    record Point(int a, int b) {
-    }
-
-    record Step(Point p, char from) {
-        Step(int a, int b, char from) {
-            this(new Point(a, b), from);
-        }
-
-        int a() {
-            return p.a();
-        }
-
-        int b() {
-            return p.b();
-        }
-    }
 
     public static int aoc16(Stream<String> input) {
         Step entryPoint = new Step(0, 0, 'W');

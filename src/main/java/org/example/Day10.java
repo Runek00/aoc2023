@@ -1,5 +1,8 @@
 package org.example;
 
+import org.example.Utils.Point;
+import org.example.Utils.Step;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,12 +14,6 @@ import static org.example.Utils.streamTo2DCharArray;
 
 public class Day10 {
 
-    record Point(int x, int y) {
-    }
-
-    record Step(Point now, char from) {
-    }
-
     public static long aoc10(Stream<String> input) {
         char[][] tab = streamTo2DCharArray(input);
         Point start = findStart(tab);
@@ -26,7 +23,7 @@ public class Day10 {
             return 0L;
         }
         long counter = 1L;
-        while (steps[0] != null && steps[1] != null && !steps[0].now().equals(steps[1].now())) {
+        while (steps[0] != null && steps[1] != null && !steps[0].p().equals(steps[1].p())) {
             steps[0] = nextStep(steps[0], tab);
             steps[1] = nextStep(steps[1], tab);
             counter++;
@@ -41,22 +38,22 @@ public class Day10 {
             Arrays.fill(cTab, 'O');
         }
         Point start = findStart(tab);
-        tab2[start.x()][start.y()] = 'S';
+        tab2[start.a()][start.b()] = 'S';
         Step[] steps = findFirstSteps(start, tab);
         if (steps.length != 2) {
             System.out.println("something went wrong");
             return 0L;
         }
-        while (steps[0] != null && steps[1] != null && !steps[0].now().equals(steps[1].now())) {
+        while (steps[0] != null && steps[1] != null && !steps[0].p().equals(steps[1].p())) {
             Step[] newSteps = new Step[2];
             newSteps[0] = nextStep(steps[0], tab);
             newSteps[1] = nextStep(steps[1], tab);
-            tab2[steps[0].now().x()][steps[0].now().y()] = 'S';
-            tab2[steps[1].now().x()][steps[1].now().y()] = 'S';
+            tab2[steps[0].p().a()][steps[0].p().b()] = 'S';
+            tab2[steps[1].p().a()][steps[1].p().b()] = 'S';
             steps = newSteps;
         }
         assert steps[0] != null;
-        tab2[steps[0].now().x()][steps[0].now().y()] = 'S';
+        tab2[steps[0].p().a()][steps[0].p().b()] = 'S';
         for (int i = 0; i < tab.length; i++) {
             boolean inside = false;
             for (int j = 0; j < tab[0].length; j++) {
@@ -68,7 +65,7 @@ public class Day10 {
                         int finalI = i;
                         int finalJ = j;
                         List<Character> froms = Arrays.stream(neighbors)
-                                .filter(step -> step.now().x() != finalI)
+                                .filter(step -> step.p().a() != finalI)
                                 .map(Step::from)
                                 .filter(d -> d == 'N' || d == 'S')
                                 .toList();
@@ -85,7 +82,7 @@ public class Day10 {
                             inside = !inside;
                         }
 
-                        matched = Arrays.stream(neighbors).map(step -> step.now().y()).anyMatch(y -> y == finalJ + 1);
+                        matched = Arrays.stream(neighbors).map(step -> step.p().b()).anyMatch(y -> y == finalJ + 1);
                         j++;
                     }
                     j--;
@@ -113,36 +110,36 @@ public class Day10 {
     }
 
     private static Step nextStep(Step step, char[][] tab) {
-        char dir = direction(step.from(), tab[step.now().x()][step.now().y()]);
+        char dir = direction(step.from(), tab[step.p().a()][step.p().b()]);
         return switch (dir) {
-            case 'N' -> new Step(new Point(step.now().x() - 1, step.now().y()), 'S');
-            case 'S' -> new Step(new Point(step.now().x() + 1, step.now().y()), 'N');
-            case 'E' -> new Step(new Point(step.now().x(), step.now().y() + 1), 'W');
-            case 'W' -> new Step(new Point(step.now().x(), step.now().y() - 1), 'E');
+            case 'N' -> new Step(new Point(step.p().a() - 1, step.p().b()), 'S');
+            case 'S' -> new Step(new Point(step.p().a() + 1, step.p().b()), 'N');
+            case 'E' -> new Step(new Point(step.p().a(), step.p().b() + 1), 'W');
+            case 'W' -> new Step(new Point(step.p().a(), step.p().b() - 1), 'E');
             default -> null;
         };
     }
 
     private static Step[] findFirstSteps(Point start, char[][] tab) {
         ArrayList<Step> output = new ArrayList<>(2);
-        if (start.x() > 0) {
-            if (direction('S', tab[start.x() - 1][start.y()]) != 'X') {
-                output.add(new Step(new Point(start.x() - 1, start.y()), 'S'));
+        if (start.a() > 0) {
+            if (direction('S', tab[start.a() - 1][start.b()]) != 'X') {
+                output.add(new Step(new Point(start.a() - 1, start.b()), 'S'));
             }
         }
-        if (start.x() < tab.length - 1) {
-            if (direction('N', tab[start.x() + 1][start.y()]) != 'X') {
-                output.add(new Step(new Point(start.x() + 1, start.y()), 'N'));
+        if (start.a() < tab.length - 1) {
+            if (direction('N', tab[start.a() + 1][start.b()]) != 'X') {
+                output.add(new Step(new Point(start.a() + 1, start.b()), 'N'));
             }
         }
-        if (start.y() > 0) {
-            if (direction('E', tab[start.x()][start.y() - 1]) != 'X') {
-                output.add(new Step(new Point(start.x(), start.y() - 1), 'E'));
+        if (start.b() > 0) {
+            if (direction('E', tab[start.a()][start.b() - 1]) != 'X') {
+                output.add(new Step(new Point(start.a(), start.b() - 1), 'E'));
             }
         }
-        if (start.y() < tab[0].length - 1) {
-            if (direction('W', tab[start.x()][start.y() + 1]) != 'X') {
-                output.add(new Step(new Point(start.x(), start.y() + 1), 'W'));
+        if (start.b() < tab[0].length - 1) {
+            if (direction('W', tab[start.a()][start.b() + 1]) != 'X') {
+                output.add(new Step(new Point(start.a(), start.b() + 1), 'W'));
             }
         }
         return output.toArray(Step[]::new);
