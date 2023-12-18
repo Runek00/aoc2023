@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.example.Utils.Direction.*;
+import static org.example.Utils.inTab;
 import static org.example.Utils.streamTo2DCharArray;
 
 public class Day16 {
@@ -127,7 +128,4 @@ public class Day16 {
         };
     }
 
-    private static boolean inTab(Step step, char[][] tab) {
-        return step.a() >= 0 && step.a() < tab.length && step.b() >= 0 && step.b() < tab[0].length;
-    }
 }

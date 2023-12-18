@@ -113,6 +113,9 @@ public class Day10 {
 
     private static Step nextStep(Step step, char[][] tab) {
         Direction dir = direction(step.from(), tab[step.a()][step.b()]);
+        if(dir == null){
+            return null;
+        }
         return switch (dir) {
             case N -> new Step(step.p().minus(S), S);
             case S -> new Step(step.p().minus(N), N);

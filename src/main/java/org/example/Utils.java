@@ -21,10 +21,22 @@ public class Utils {
                 .toArray(char[][]::new);
     }
 
+    static boolean inTab(Step step, char[][] tab) {
+        return step.a() >= 0 && step.a() < tab.length && step.b() >= 0 && step.b() < tab[0].length;
+    }
+
+    static boolean inTab(Point point, char[][] tab) {
+        return point.a() >= 0 && point.a() < tab.length && point.b() >= 0 && point.b() < tab[0].length;
+    }
+
     record Point(int a, int b) {
 
         public Point minus(Direction dir) {
             return new Point(a - dir.change().a(), b - dir.change().b());
+        }
+
+        public Point plus(Direction dir) {
+            return new Point(a + dir.change().a(), b + dir.change().b());
         }
     }
 
@@ -57,6 +69,19 @@ public class Utils {
 
         public Point change() {
             return change;
+        }
+
+        public Direction opposite() {
+            return switch (this) {
+                case N -> S;
+                case S -> N;
+                case E -> W;
+                case W -> E;
+            };
+        }
+
+        public static Direction[] getAll() {
+            return new Direction[]{N, S, E, W};
         }
     }
 
