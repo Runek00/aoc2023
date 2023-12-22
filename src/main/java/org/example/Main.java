@@ -25,6 +25,8 @@ import static org.example.Day2.aoc2;
 import static org.example.Day2.aoc2a;
 import static org.example.Day20.aoc20;
 import static org.example.Day20.aoc20a;
+import static org.example.Day21.aoc21;
+import static org.example.Day21.aoc21a;
 import static org.example.Day3.aoc3;
 import static org.example.Day3.aoc3a;
 import static org.example.Day4.aoc4;
@@ -82,6 +84,8 @@ public class Main {
         System.out.println(aoc19(fileToString(input19)));
         System.out.println(aoc20(fileToStream(input20)));
 //        System.out.println(aoc20a(fileToStream(input20)));
+        System.out.println(aoc21(fileToStream(input21)));
+        System.out.println(aoc21a(fileToStream(test)));
     }
 
 
@@ -106,5 +110,6 @@ public class Main {
     private static final String input18 = "src/main/java/org/example/inputs/day18input";
     private static final String input19 = "src/main/java/org/example/inputs/day19input";
     private static final String input20 = "src/main/java/org/example/inputs/day20input";
+    private static final String input21 = "src/main/java/org/example/inputs/day21input";
 
 }
