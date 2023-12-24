@@ -87,7 +87,7 @@ public class Main {
 //        System.out.println(aoc20a(fileToStream(input20)));
         System.out.println(aoc21(fileToStream(input21)));
 //        System.out.println(aoc21a(fileToStream(test)));
-        System.out.println(aoc22(fileToStream(test)));
+        System.out.println(aoc22(fileToStream(input22)));
     }
 
 
@@ -113,5 +113,6 @@ public class Main {
     private static final String input19 = "src/main/java/org/example/inputs/day19input";
     private static final String input20 = "src/main/java/org/example/inputs/day20input";
     private static final String input21 = "src/main/java/org/example/inputs/day21input";
+    private static final String input22 = "src/main/java/org/example/inputs/day22input";
 
 }
