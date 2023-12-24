@@ -4,52 +4,42 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-record Cube(int x, int y, int z) {
-}
-
-record Brick(Cube start, Cube end, String name) {
-
-    int lowerX() {
-        return Math.min(start().x(), end().x());
-    }
-
-    int higherX() {
-        return Math.max(start().x(), end().x());
-    }
-
-    int lowerY() {
-        return Math.min(start().y(), end().y());
-    }
-
-    int higherY() {
-        return Math.max(start().y(), end().y());
-    }
-
-    int lowerZ() {
-        return Math.min(start().z(), end().z());
-    }
-
-    int higherZ() {
-        return Math.max(start().z(), end().z());
-    }
-}
-
 public class Day22 {
+
+    record Cube(int x, int y, int z) {
+    }
+
+    record Brick(Cube start, Cube end, String name) {
+
+        int lowerX() {
+            return Math.min(start().x(), end().x());
+        }
+
+        int higherX() {
+            return Math.max(start().x(), end().x());
+        }
+
+        int lowerY() {
+            return Math.min(start().y(), end().y());
+        }
+
+        int higherY() {
+            return Math.max(start().y(), end().y());
+        }
+
+        int lowerZ() {
+            return Math.min(start().z(), end().z());
+        }
+
+        int higherZ() {
+            return Math.max(start().z(), end().z());
+        }
+    }
     static int[][] topsMap = new int[10][10];
     static Map<Integer, Set<Brick>> levelBricks = new HashMap<>();
 
     public static long aoc22(Stream<String> input) {
         String[][][] tower = parseTower(input);
-//        for(int k = 0; k < 15; k++) {
-//            for (int i = 0; i < 3; i++) {
-//                for (int j = 0; j < 3; j++) {
-//                    System.out.print(tower[i][j][k] + "  ");
-//                }
-//                System.out.print("\n");
-//            }
-//            System.out.print("\n");
-//            System.out.print("\n");
-//        }
         return countRemovable(tower);
     }
 
