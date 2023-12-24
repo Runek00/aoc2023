@@ -11,10 +11,17 @@ import static org.example.Utils.inTab;
 import static org.example.Utils.streamTo2DCharArray;
 
 public class Day23 {
+
     public static long aoc23(Stream<String> input) {
         char[][] tab = streamTo2DCharArray(input);
         Point start = findStart(tab);
-        return maxBfs(tab, start, new HashSet<>());
+        return maxBfs(tab, start, new HashSet<>(), true);
+    }
+
+    public static long aoc23a(Stream<String> input) {
+        char[][] tab = streamTo2DCharArray(input);
+        Point start = findStart(tab);
+        return maxBfs(tab, start, new HashSet<>(), false);
     }
 
     private static Point findStart(char[][] tab) {
@@ -26,7 +33,7 @@ public class Day23 {
         return new Point(-1,-1);
     }
 
-    private static long maxBfs(char[][] tab, Point point, HashSet<Point> visited) {
+    private static long maxBfs(char[][] tab, Point point, HashSet<Point> visited, boolean slopes) {
         if(!inTab(point, tab)) {
             return 0L;
         }
@@ -41,16 +48,16 @@ public class Day23 {
         }
         visited.add(point);
         long result = Long.MIN_VALUE;
-        if(tab[point.a()][point.b()] == '.') {
+        if(tab[point.a()][point.b()] == '.' || (!slopes)) {
             for(Direction dir : Direction.getAll()) {
-                result = Math.max(result, maxBfs(tab, point.plus(dir), visited));
+                result = Math.max(result, maxBfs(tab, point.plus(dir), visited, slopes));
             }
         } else {
             result = switch (tab[point.a()][point.b()]) {
-                case '^' -> maxBfs(tab, point.plus(N), visited);
-                case '>' -> maxBfs(tab, point.plus(E), visited);
-                case 'v' -> maxBfs(tab, point.plus(S), visited);
-                case '<' -> maxBfs(tab, point.plus(W), visited);
+                case '^' -> maxBfs(tab, point.plus(N), visited, true);
+                case '>' -> maxBfs(tab, point.plus(E), visited, true);
+                case 'v' -> maxBfs(tab, point.plus(S), visited, true);
+                case '<' -> maxBfs(tab, point.plus(W), visited, true);
                 default -> 0;
             };
         }
