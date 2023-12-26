@@ -2,11 +2,19 @@ package org.example;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Day12 {
 
     private static final int repeat = 5;
+
+    static Map<Line, Long> orderMem = new ConcurrentHashMap<>();
+
+    record Line(String row, String orderList) {
+    }
 
     public static long aoc12(Stream<String> input) {
         return input
@@ -60,6 +68,11 @@ public class Day12 {
         if (orderList.isEmpty()) {
             return 0;
         }
+        String orderString = orderList.stream().map(Object::toString).collect(Collectors.joining(","));
+        Line line = new Line(row, orderString);
+        if (orderMem.containsKey(line)) {
+            return orderMem.get(line);
+        }
 
         long orderSum = orderList.stream().mapToLong(l -> l).sum();
         long output = 0L;
@@ -78,6 +91,7 @@ public class Day12 {
             String restOfRow = spl.length == 2 ? spl[1] : "";
             output += arrangements(restOfRow, orderList.subList(1, orderList.size()));
         }
+        orderMem.put(line, output);
         return output;
     }
 
