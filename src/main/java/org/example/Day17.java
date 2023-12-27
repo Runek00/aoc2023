@@ -26,21 +26,26 @@ public class Day17 {
 
     public static long aoc17(Stream<String> input) {
         char[][] tab = streamTo2DCharArray(input);
-        return pathSearch(new Point(0, 0), new Point(tab.length - 1, tab[0].length - 1), tab);
+        return pathSearch(new Point(0, 0), new Point(tab.length - 1, tab[0].length - 1), tab, 0, 3);
     }
 
-    private static long pathSearch(Point start, Point goal, char[][] tab) {
+    public static long aoc17a(Stream<String> input) {
+        char[][] tab = streamTo2DCharArray(input);
+        return pathSearch(new Point(0, 0), new Point(tab.length - 1, tab[0].length - 1), tab, 4, 8);
+    }
+
+    private static long pathSearch(Point start, Point goal, char[][] tab, int minSteps, int maxSteps) {
 
         Map<DirPoint, Map<Short, Long>> shortestPathMap = new HashMap<>();
         for (Direction dir : Direction.getAll()) {
             HashMap<Short, Long> zeroMap = new HashMap<>();
-            zeroMap.put((short) 0, 0L);
+            zeroMap.put((short) 1, 0L);
             shortestPathMap.put(new DirPoint(start, dir), zeroMap);
         }
 
         Queue<CountedDirPoint> q = new ArrayDeque<>();
         for (Direction dir : Direction.getAll()) {
-            CountedDirPoint cdp = new CountedDirPoint(start, dir, 0);
+            CountedDirPoint cdp = new CountedDirPoint(start, dir, 1);
             q.add(cdp);
         }
 
@@ -50,6 +55,9 @@ public class Day17 {
             if (!inTab(neighbor, tab)) {
                 continue;
             }
+            if (step.count() > maxSteps) {
+                continue;
+            }
             for (Direction nextDir : Direction.getAll()) {
                 if (nextDir == step.dir().opposite()) {
                     continue;
@@ -57,14 +65,14 @@ public class Day17 {
                 DirPoint dirPoint = new DirPoint(neighbor, nextDir);
                 Map<Short, Long> dirMap = shortestPathMap.getOrDefault(dirPoint, new HashMap<>());
                 if (nextDir == step.dir()) {
-                    if (step.count() >= 3) {
+                    if (step.count() == maxSteps) {
                         continue;
                     }
                     long newPath = shortestPathMap.getOrDefault(step.dp(), new HashMap<>()).getOrDefault(step.count(), (long) Integer.MAX_VALUE) + tab[neighbor.a()][neighbor.b()] - 48;
-                    Long oldPath = dirMap.getOrDefault((short) (step.count() + 1), (long) Integer.MAX_VALUE);
+                    Long oldPath = dirMap.getOrDefault(step.count(), (long) Integer.MAX_VALUE);
                     if (oldPath > newPath) {
                         short cc = (short) (step.count() + 1);
-                        while (cc < 3) {
+                        while (cc <= maxSteps) {
                             if (dirMap.getOrDefault(cc, (long) Integer.MAX_VALUE) > newPath) {
                                 dirMap.put(cc, newPath);
                             }
@@ -74,18 +82,21 @@ public class Day17 {
                         q.add(new CountedDirPoint(neighbor, nextDir, step.count() + 1));
                     }
                 } else {
+                    if (step.count() < minSteps) {
+                        continue;
+                    }
                     long newPath = shortestPathMap.getOrDefault(step.dp(), new HashMap<>()).getOrDefault(step.count(), (long) Integer.MAX_VALUE) + tab[neighbor.a()][neighbor.b()] - 48;
-                    Long oldPath = dirMap.getOrDefault((short) (0), (long) Integer.MAX_VALUE);
+                    Long oldPath = dirMap.getOrDefault((short) (1), (long) Integer.MAX_VALUE);
                     if (oldPath > newPath) {
-                        short cc = (short) 0;
-                        while (cc < 3) {
+                        short cc = (short) 1;
+                        while (cc <= maxSteps) {
                             if (dirMap.getOrDefault(cc, (long) Integer.MAX_VALUE) > newPath) {
                                 dirMap.put(cc, newPath);
                             }
                             cc++;
                         }
                         shortestPathMap.put(dirPoint, dirMap);
-                        q.add(new CountedDirPoint(neighbor, nextDir, 0));
+                        q.add(new CountedDirPoint(neighbor, nextDir, 1));
                     }
                 }
             }

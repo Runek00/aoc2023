@@ -19,6 +19,7 @@ import static org.example.Day15.aoc15a;
 import static org.example.Day16.aoc16;
 import static org.example.Day16.aoc16a;
 import static org.example.Day17.aoc17;
+import static org.example.Day17.aoc17a;
 import static org.example.Day18.aoc18;
 import static org.example.Day18.aoc18a;
 import static org.example.Day19.aoc19;
@@ -82,6 +83,7 @@ public class Main {
         System.out.println(aoc16(fileToStream(input16)));
         System.out.println(aoc16a(fileToStream(input16)));
         System.out.println(aoc17(fileToStream(input17)));
+        System.out.println(aoc17a(fileToStream(input17)));
         System.out.println(aoc18(fileToStream(input18)));
         System.out.println(aoc18a(fileToStream(input18)));
         System.out.println(aoc19(fileToString(input19)));
