@@ -11,105 +11,91 @@ import static org.example.Utils.streamTo2DCharArray;
 
 public class Day17 {
 
+    record DirPoint(Point p, Direction dir) {
+    }
+
+    record CountedDirPoint(Point p, Direction dir, short count) {
+        public CountedDirPoint(Point p, Direction dir, int count) {
+            this(p, dir, (short) count);
+        }
+
+        public DirPoint dp() {
+            return new DirPoint(p, dir);
+        }
+    }
+
     public static long aoc17(Stream<String> input) {
         char[][] tab = streamTo2DCharArray(input);
-        return aStar(new Point(0, 0), new Point(tab.length - 1, tab[0].length - 1), tab);
+        return pathSearch(new Point(0, 0), new Point(tab.length - 1, tab[0].length - 1), tab);
     }
 
-    private static int aStar(Point start, Point goal, char[][] tab) {
+    private static long pathSearch(Point start, Point goal, char[][] tab) {
 
-        int infinity = 10000;
+        Map<DirPoint, Map<Short, Long>> shortestPathMap = new HashMap<>();
+        for (Direction dir : Direction.getAll()) {
+            HashMap<Short, Long> zeroMap = new HashMap<>();
+            zeroMap.put((short) 0, 0L);
+            shortestPathMap.put(new DirPoint(start, dir), zeroMap);
+        }
 
-        HashMap<Point, Set<Point>> cameFrom = new HashMap<>();
-        HashMap<Point, Integer> gScore = new HashMap<>();
-        HashMap<Point, Integer> fScore = new HashMap<>();
-        PriorityQueue<Point> openSet = new PriorityQueue<>(Comparator.comparing(point -> fScore.getOrDefault(point, infinity)));
-        gScore.put(start, 0);
-        fScore.put(start, 5*(tab.length + tab[0].length));
-        openSet.add(start);
+        Queue<CountedDirPoint> q = new ArrayDeque<>();
+        for (Direction dir : Direction.getAll()) {
+            CountedDirPoint cdp = new CountedDirPoint(start, dir, 0);
+            q.add(cdp);
+        }
 
-        int minSum = Integer.MAX_VALUE;
-        while (!openSet.isEmpty()) {
-            Point current = openSet.poll();
-            if (current.equals(goal)) {
-                minSum = Math.min(minSum, reconstructPath(current, cameFrom, tab));
+        while (!q.isEmpty()) {
+            CountedDirPoint step = q.poll();
+            Point neighbor = step.p().plus(step.dir());
+            if (!inTab(neighbor, tab)) {
+                continue;
             }
-            for (Direction dir : Direction.getAll()) {
-                Point neighbor = current.plus(dir);
-//                System.out.println(neighbor);
-                if (!inTab(neighbor, tab) || cameFrom.getOrDefault(current, Set.of(new Point(-1, -1))).contains(neighbor)) {
+            for (Direction nextDir : Direction.getAll()) {
+                if (nextDir == step.dir().opposite()) {
                     continue;
                 }
-                int tenativeScore = gScore.get(current) + dist(current, neighbor, cameFrom, tab);
-                if (tenativeScore < gScore.getOrDefault(neighbor, infinity)) {
-                    Set<Point> fromSet = new HashSet<>();
-                    fromSet.add(current);
-                    cameFrom.put(neighbor, fromSet);
-                    gScore.put(neighbor, tenativeScore);
-                    fScore.put(neighbor, tenativeScore + 5*((tab.length + tab[0].length) - neighbor.a() - neighbor.b()));
-                    if (!openSet.contains(neighbor)) {
-                        openSet.add(neighbor);
+                DirPoint dirPoint = new DirPoint(neighbor, nextDir);
+                Map<Short, Long> dirMap = shortestPathMap.getOrDefault(dirPoint, new HashMap<>());
+                if (nextDir == step.dir()) {
+                    if (step.count() >= 3) {
+                        continue;
                     }
-                }else if (tenativeScore < infinity && tenativeScore == gScore.getOrDefault(neighbor, infinity)) {
-                    Set<Point> fromSet = cameFrom.getOrDefault(neighbor, new HashSet<>());
-                    fromSet.add(current);
-                    cameFrom.put(neighbor, fromSet);
-                    if (!openSet.contains(neighbor)) {
-                        openSet.add(neighbor);
+                    long newPath = shortestPathMap.getOrDefault(step.dp(), new HashMap<>()).getOrDefault(step.count(), (long) Integer.MAX_VALUE) + tab[neighbor.a()][neighbor.b()] - 48;
+                    Long oldPath = dirMap.getOrDefault((short) (step.count() + 1), (long) Integer.MAX_VALUE);
+                    if (oldPath > newPath) {
+                        short cc = (short) (step.count() + 1);
+                        while (cc < 3) {
+                            if (dirMap.getOrDefault(cc, (long) Integer.MAX_VALUE) > newPath) {
+                                dirMap.put(cc, newPath);
+                            }
+                            cc++;
+                        }
+                        shortestPathMap.put(dirPoint, dirMap);
+                        q.add(new CountedDirPoint(neighbor, nextDir, step.count() + 1));
+                    }
+                } else {
+                    long newPath = shortestPathMap.getOrDefault(step.dp(), new HashMap<>()).getOrDefault(step.count(), (long) Integer.MAX_VALUE) + tab[neighbor.a()][neighbor.b()] - 48;
+                    Long oldPath = dirMap.getOrDefault((short) (0), (long) Integer.MAX_VALUE);
+                    if (oldPath > newPath) {
+                        short cc = (short) 0;
+                        while (cc < 3) {
+                            if (dirMap.getOrDefault(cc, (long) Integer.MAX_VALUE) > newPath) {
+                                dirMap.put(cc, newPath);
+                            }
+                            cc++;
+                        }
+                        shortestPathMap.put(dirPoint, dirMap);
+                        q.add(new CountedDirPoint(neighbor, nextDir, 0));
                     }
                 }
             }
         }
-        return minSum;
-    }
 
-    private static Integer dist(Point current, Point neighbor, HashMap<Point, Set<Point>> cameFrom, char[][] tab) {
-        if (!inTab(neighbor, tab)) {
-            return 10000;
-        }
-        if (current.a() == neighbor.a()) {
-            Point prev = cameFrom.getOrDefault(current, new HashSet<>()).stream().filter(point -> point.a() == current.a()).findFirst().orElse(null);
-            Point antiprev = cameFrom.getOrDefault(current, new HashSet<>()).stream().filter(point -> point.a() != current.a()).findFirst().orElse(null);
-            if (antiprev == null && prev != null) {
-                Point prevprev = cameFrom.getOrDefault(prev, new HashSet<>()).stream().filter(point -> point != current && point.a() == current.a()).findFirst().orElse(null);
-                Point antiprevprev = cameFrom.getOrDefault(prev, new HashSet<>()).stream().filter(point -> point != current && point.a() != current.a()).findFirst().orElse(null);
-                if (antiprevprev == null && prevprev != null) {
-                    Point prevprevprev = cameFrom.getOrDefault(prevprev, new HashSet<>()).stream().filter(point -> point != current && point.a() == current.a()).findFirst().orElse(null);
-                    Point antiprevprevprev = cameFrom.getOrDefault(prevprev, new HashSet<>()).stream().filter(point -> point != current && point.a() != current.a()).findFirst().orElse(null);
-                    if (antiprevprevprev == null && prevprevprev != null) {
-                        return 10000;
-                    }
-                }
-            }
-        } else if (current.b() == neighbor.b()) {
-            Point prev = cameFrom.getOrDefault(current, new HashSet<>()).stream().filter(point -> point.b() == current.b()).findFirst().orElse(null);
-            Point antiprev = cameFrom.getOrDefault(current, new HashSet<>()).stream().filter(point -> point.b() != current.b()).findFirst().orElse(null);
-            if (antiprev == null && prev != null) {
-                Point prevprev = cameFrom.getOrDefault(prev, new HashSet<>()).stream().filter(point -> point != current && point.b() == current.b()).findFirst().orElse(null);
-                Point antiprevprev = cameFrom.getOrDefault(prev, new HashSet<>()).stream().filter(point -> point != current && point.b() != current.b()).findFirst().orElse(null);
-                if (antiprevprev == null && prevprev != null) {
-                    Point prevprevprev = cameFrom.getOrDefault(prevprev, new HashSet<>()).stream().filter(point -> point != current && point.b() == current.b()).findFirst().orElse(null);
-                    Point antiprevprevprev = cameFrom.getOrDefault(prevprev, new HashSet<>()).stream().filter(point -> point != current && point.b() != current.b()).findFirst().orElse(null);
-                    if (antiprevprevprev == null && prevprevprev != null) {
-                        return 10000;
-                    }
-                }
-            }
-        } else {
-            return 10000;
-        }
-        return tab[neighbor.a()][neighbor.b()] - 48;
-    }
-
-    private static int reconstructPath(Point current, HashMap<Point, Set<Point>> cameFrom, char[][] tab) {
-        int sum = 0;
-        Set<Point> used = new HashSet<>();
-        used.add(current);
-        while (cameFrom.containsKey(current)) {
-            sum += tab[current.a()][current.b()] - 48;
-            current = cameFrom.get(current).stream().filter(point -> !used.contains(point)).findFirst().orElse(null);
-            used.add(current);
-        }
-        return sum;
+        return Arrays.stream(Direction.getAll())
+                .map(dir -> new DirPoint(goal, dir))
+                .flatMap(dp -> shortestPathMap.getOrDefault(dp, new HashMap<>()).values().stream())
+                .mapToLong(l -> l)
+                .min()
+                .orElse(0L);
     }
 }
