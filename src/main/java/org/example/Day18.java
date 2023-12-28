@@ -31,7 +31,7 @@ public class Day18 {
 //        for(int i = 0; i< tab.length; i++){
 //            System.out.println(Arrays.toString(tab[i]));
 //        }
-        cnt += getCnt(tab);
+        cnt = getCnt(tab);
         return cnt;
     }
 
@@ -41,7 +41,7 @@ public class Day18 {
         TreeMap<Integer, List<List<Integer>>> horizontals = new TreeMap<>();
         Point start = new Point(0, 0);
         for (String line : inputList) {
-            Dig dig = toColorDig(line);
+            Dig dig = toDig(line);
             switch (dig.dir()) {
                 case N -> {
                     int newA = start.a() - dig.count();
@@ -88,18 +88,24 @@ public class Day18 {
             long lineSum = horLines.stream().mapToLong(l -> l.getLast() - l.getFirst() + 1).sum();
             sum += lineSum * ((long) (next - top));
             long fullSum = getFullSum(horLines, horizontals.get(next));
+            sum += Math.max(lineSum, fullSum);
             horLines.addAll(horizontals.get(next));
             horLines = normalizeRanges(horLines);
-            sum += Math.max(lineSum, fullSum);
             top = next + 1;
+//            System.out.println("line: " + next +", sum: " + sum);
         }
         return sum;
     }
 
     private static long getFullSum(List<List<Integer>> currentLines, List<List<Integer>> nextLines) {
         TreeMap<Integer, List<Integer>> byStarts = new TreeMap<>();
-        currentLines.addAll(nextLines);
         for (List<Integer> integers : currentLines) {
+            List<Integer> l = byStarts.getOrDefault(integers.getFirst(), List.of(integers.getFirst(), Integer.MIN_VALUE));
+            if (l.getLast() < integers.getLast()) {
+                byStarts.put(integers.getFirst(), integers);
+            }
+        }
+        for (List<Integer> integers : nextLines) {
             List<Integer> l = byStarts.getOrDefault(integers.getFirst(), List.of(integers.getFirst(), Integer.MIN_VALUE));
             if (l.getLast() < integers.getLast()) {
                 byStarts.put(integers.getFirst(), integers);
@@ -150,7 +156,7 @@ public class Day18 {
                     start = null;
                     end = null;
                 }
-            } else if (Objects.equals(newRange.getFirst(), end)) {
+            } else if (newRange.getFirst().equals(end)) {
                 end = newRange.getLast();
             } else {
                 output.add(List.of(start, end));
@@ -183,9 +189,11 @@ public class Day18 {
             boolean inside = false;
             for (int j = 0; j < tab[0].length; j++) {
                 if (tab[i][j] == '#') {
+                    int j1 = j;
                     boolean matched = true;
                     Direction from = null;
                     while (matched) {
+                        cnt++;
                         Step[] neighbors = findNeighborSteps(new Point(i, j), tab);
                         int finalI = i;
                         int finalJ = j;
@@ -211,6 +219,9 @@ public class Day18 {
                         j++;
                     }
                     j--;
+                    if(j1 != j) {
+                        System.out.println(j1 + ", " + j);
+                    }
                 } else {
                     if (inside) {
                         cnt++;
