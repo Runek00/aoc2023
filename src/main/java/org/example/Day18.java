@@ -26,13 +26,7 @@ public class Day18 {
         for (char[] cTab : tab) {
             Arrays.fill(cTab, '.');
         }
-        Point start = new Point(-tabSize.getOrDefault(N, 0), -tabSize.getOrDefault(W, 0));
-        int cnt = drawInTab(tab, inputList, start, Day18::toDig);
-//        for(int i = 0; i< tab.length; i++){
-//            System.out.println(Arrays.toString(tab[i]));
-//        }
-        cnt = getCnt(tab);
-        return cnt;
+        return getCnt(tab);
     }
 
     public static long aoc18a(Stream<String> input) {
@@ -220,7 +214,7 @@ public class Day18 {
                     }
                     j--;
                     if(j1 != j) {
-                        System.out.println(j1 + ", " + j);
+//                        System.out.println(j1 + ", " + j);
                     }
                 } else {
                     if (inside) {
