@@ -29,6 +29,7 @@ public class Day18 {
         boolean hasInside(Line other) {
             return start() < other.start() && end() > other.end();
         }
+
         boolean fullyClosedBy(Line other) {
             return this.equals(other);
         }
@@ -52,12 +53,8 @@ public class Day18 {
             Arrays.fill(cTab, '.');
         }
         Point start = new Point(-tabSize.getOrDefault(N, 0), -tabSize.getOrDefault(W, 0));
-        int cnt = drawInTab(tab, inputList, start, Day18::toDig);
-//        for(int i = 0; i< tab.length; i++){
-//            System.out.println(Arrays.toString(tab[i]));
-//        }
-        cnt = getCnt(tab);
-        return cnt;
+        drawInTab(tab, inputList, start, Day18::toDig);
+        return getCnt(tab);
     }
 
     public static long aoc18a(Stream<String> input) {
@@ -66,7 +63,7 @@ public class Day18 {
         TreeMap<Integer, List<Line>> horizontals = new TreeMap<>();
         Point start = new Point(0, 0);
         for (String line : inputList) {
-            Dig dig = toDig(line);
+            Dig dig = toColorDig(line);
             switch (dig.dir()) {
                 case N -> {
                     int newA = start.a() - dig.count();
@@ -104,57 +101,25 @@ public class Day18 {
 
     private static long countFields(TreeMap<Integer, List<Line>> horizontals) {
         long sum = 0;
-        int line = 0;
         int top = horizontals.firstKey();
         List<Line> horLines = horizontals.get(top);
         sum += horLines.stream().mapToLong(l -> l.end() - l.start() + 1).sum();
         top++;
-        char[] tab = new char[375];
-        Arrays.fill(tab, '.');
-        for (Line horLine : horLines) {
-            int bound = horLine.end();
-            for (int i = horLine.start(); i <= bound; i++) {
-                tab[i + 161] = '#';
-            }
-        }
-        System.out.println(line + ": " + Arrays.toString(tab));
+        int next = top;
         while (horizontals.higherKey(top) != null) {
-            int next = horizontals.higherKey(top);
+            next = horizontals.higherKey(next);
             long lineSum = horLines.stream().mapToLong(l -> l.end() - l.start() + 1).sum();
             sum += lineSum * ((long) (next - top));
             long fullSum = getFullSum(horLines, horizontals.get(next));
             sum += Math.max(lineSum, fullSum);
             horLines = normalizeRanges(horLines, horizontals.get(next));
-            line += next - top + 1;
             top = next + 1;
-//            System.out.println("line: " + next +", sum: " + sum);
-            tab = new char[375];
-            Arrays.fill(tab, '.');
-            for (Line hLine : horLines) {
-                int bound = hLine.end();
-                for (int i = hLine.start(); i <= bound; i++) {
-                    tab[i + 161] = '#';
-                }
-            }
-            System.out.println(line + ": " + Arrays.toString(tab));
         }
         return sum;
     }
 
     private static long getFullSum(List<Line> currentLines, List<Line> nextLines) {
-        TreeMap<Integer, Line> byStarts = new TreeMap<>();
-        for (Line line : currentLines) {
-            Line l = byStarts.getOrDefault(line.start(), new Line(line.start(), Integer.MIN_VALUE));
-            if (l.end() < line.end()) {
-                byStarts.put(line.start(), line);
-            }
-        }
-        for (Line line : nextLines) {
-            Line l = byStarts.getOrDefault(line.start(), new Line(line.start(), Integer.MIN_VALUE));
-            if (l.end() < line.end()) {
-                byStarts.put(line.start(), line);
-            }
-        }
+        TreeMap<Integer, Line> byStarts = getMapByStarts(currentLines, nextLines);
         List<Line> output = new ArrayList<>();
         Line firstRange = byStarts.pollFirstEntry().getValue();
         int start = firstRange.start();
@@ -173,6 +138,23 @@ public class Day18 {
         return output.stream().mapToLong(l -> l.end() - l.start() + 1).sum();
     }
 
+    private static TreeMap<Integer, Line> getMapByStarts(List<Line> currentLines, List<Line> nextLines) {
+        TreeMap<Integer, Line> byStarts = new TreeMap<>();
+        for (Line line : currentLines) {
+            Line l = byStarts.getOrDefault(line.start(), new Line(line.start(), Integer.MIN_VALUE));
+            if (l.end() < line.end()) {
+                byStarts.put(line.start(), line);
+            }
+        }
+        for (Line line : nextLines) {
+            Line l = byStarts.getOrDefault(line.start(), new Line(line.start(), Integer.MIN_VALUE));
+            if (l.end() < line.end()) {
+                byStarts.put(line.start(), line);
+            }
+        }
+        return byStarts;
+    }
+
     private static List<Line> normalizeRanges(List<Line> oldLines, List<Line> newLines) {
         NavigableMap<Integer, Line> oldByStarts = new TreeMap<>();
         for (Line integers : oldLines) {
@@ -183,38 +165,44 @@ public class Day18 {
             newByStarts.put(integers.start(), integers);
         }
         List<Line> output = new ArrayList<>();
-        Set<Line> removedOldLines = new HashSet<>();
-        NewLoop:
-        for (Line newLine : newByStarts.values()) {
-            for (Line oldLine : oldByStarts.values().stream().filter(l -> !removedOldLines.contains(l)).toList()) {
-                if(oldLine.lConnected(newLine)) {
-                    newLine = new Line(newLine.start(), oldLine.end());
-                    removedOldLines.add(oldLine);
-                } else if( oldLine.rConnected(newLine)) {
-                    newLine = new Line(oldLine.start(), newLine.end());
-                    removedOldLines.add(oldLine);
-                } else if(oldLine.hasInside(newLine)) {
+        Set<Line> usedNewLines = new HashSet<>();
+        OldLoop:
+        for (Line oldLine : oldByStarts.values()) {
+            for (Line newLine : newByStarts.values()) {
+                if (usedNewLines.contains(newLine)) {
+                    continue;
+                }
+                if (oldLine.lConnected(newLine)) {
+                    oldLine = new Line(newLine.start(), oldLine.end());
+                    usedNewLines.add(newLine);
+                } else if (oldLine.rConnected(newLine)) {
+                    oldLine = new Line(oldLine.start(), newLine.end());
+                    usedNewLines.add(newLine);
+                } else if (oldLine.hasInside(newLine)) {
                     output.add(new Line(oldLine.start(), newLine.start()));
-                    newLine = new Line(newLine.end(), oldLine.end);
-                    removedOldLines.add(oldLine);
+                    oldLine = new Line(newLine.end(), oldLine.end);
+                    usedNewLines.add(newLine);
                 } else if (oldLine.fullyClosedBy(newLine)) {
-                    removedOldLines.add(oldLine);
-                    continue NewLoop;
-                } else if(oldLine.lClosedBy(newLine)) {
-                    newLine = new Line(newLine.end(), oldLine.end());
-                    removedOldLines.add(oldLine);
+                    usedNewLines.add(newLine);
+                    continue OldLoop;
+                } else if (oldLine.lClosedBy(newLine)) {
+                    oldLine = new Line(newLine.end(), oldLine.end());
+                    usedNewLines.add(newLine);
                 } else if (oldLine.rClosedBy(newLine)) {
-                    newLine = new Line(oldLine.start(), newLine.start());
-                    removedOldLines.add(oldLine);
+                    oldLine = new Line(oldLine.start(), newLine.start());
+                    usedNewLines.add(newLine);
                 }
             }
-            output.add(newLine);
+            output.add(oldLine);
         }
-        output.addAll(oldByStarts.values().stream().filter(l -> !removedOldLines.contains(l)).collect(Collectors.toSet()));
+        output.addAll(newByStarts.values().stream().filter(l -> !usedNewLines.contains(l)).collect(Collectors.toSet()));
         return joinRanges(output);
     }
 
     private static List<Line> joinRanges(List<Line> input) {
+        if (input.isEmpty()) {
+            return input;
+        }
         List<Line> output = new ArrayList<>();
         NavigableMap<Integer, Line> lines = new TreeMap<>();
         for (Line integers : input) {
@@ -222,9 +210,9 @@ public class Day18 {
         }
 
         Line currLine = lines.pollFirstEntry().getValue();
-        while(!lines.isEmpty()) {
+        while (!lines.isEmpty()) {
             Line nextLine = lines.pollFirstEntry().getValue();
-            if(currLine.rConnected(nextLine)) {
+            if (currLine.rConnected(nextLine)) {
                 currLine = new Line(currLine.start(), nextLine.end());
             } else {
                 output.add(currLine);
@@ -239,10 +227,8 @@ public class Day18 {
         int cnt = 0;
         for (int i = 0; i < tab.length; i++) {
             boolean inside = false;
-            boolean printLine = false;
             for (int j = 0; j < tab[0].length; j++) {
                 if (tab[i][j] == '#') {
-                    int j1 = j;
                     boolean matched = true;
                     Direction from = null;
                     while (matched) {
@@ -272,35 +258,25 @@ public class Day18 {
                         j++;
                     }
                     j--;
-                    if (j1 != j) {
-                        printLine = true;
-//                        System.out.println(j1 + ", " + j);
-                    }
                 } else {
                     if (inside) {
                         cnt++;
                     }
                 }
             }
-            if (printLine) {
-//                System.out.println(i + ": " + Arrays.toString(tab[i]));
-            }
         }
         return cnt;
     }
 
-    private static int drawInTab(char[][] tab, List<String> inputList, Point start, Function<String, Dig> toDig) {
+    private static void drawInTab(char[][] tab, List<String> inputList, Point start, Function<String, Dig> toDig) {
         tab[start.a()][start.b()] = '#';
-        int cnt = 0;
         for (String line : inputList) {
             Dig dig = toDig.apply(line);
             for (int i = 0; i < dig.count(); i++) {
-                cnt++;
                 start = start.plus(dig.dir());
                 tab[start.a()][start.b()] = '#';
             }
         }
-        return cnt;
     }
 
     private static Map<Direction, Integer> getSizeMap(List<String> inputList, Function<String, Dig> toDig) {
