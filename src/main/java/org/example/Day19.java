@@ -13,29 +13,51 @@ public class Day19 {
     record Part(int x, int m, int a, int s) {
     }
 
-    record Workflow(String name, Function<Part, String> condition) {
+    record Condition(Function<Part, Integer> valueAccessor, boolean greater, Integer condValue, String redir) {
+
+        Condition(String output) {
+            this(part -> 0, false, 1, output);
+        }
+
+        boolean passes(Part part) {
+            Integer partVal = valueAccessor().apply(part);
+            return (greater() && partVal > condValue()) || (!greater() && partVal < condValue());
+        }
+    }
+
+    record Workflow(String name, List<Condition> conditions) {
+        String process(Part part) {
+            for (Condition cond : conditions()) {
+                if (cond.passes(part)) {
+                    return cond.redir();
+                }
+            }
+            return "R";
+        }
     }
 
 
     static class PartProcessor {
-        Map<String, Function<Part, String>> flowMap;
+        Map<String, Workflow> flowMap;
         List<Part> accepted = new ArrayList<>();
 
-        PartProcessor(Map<String, Function<Part, String>> flowMap) {
+        PartProcessor(Map<String, Workflow> flowMap) {
             this.flowMap = flowMap;
-            flowMap.put("R", (Part part) -> null);
-            flowMap.put("A", (Part part) -> {
+            flowMap.put("R", new Workflow("R", List.of(new Condition(null))));
+            flowMap.put("A", new Workflow("A", List.of(new Condition((Part part) -> {
                 accepted.add(part);
-                return null;
-            });
-
+                return 0;
+            },
+                    false,
+                    1,
+                    null))));
         }
 
         long processParts(Stream<Part> parts) {
             parts.forEach(part -> {
                 String result = "in";
                 do {
-                    result = flowMap.get(result).apply(part);
+                    result = flowMap.get(result).process(part);
                 } while (result != null);
             });
             return accepted.stream().mapToLong(part -> part.x() + part.m() + part.a() + part.s()).sum();
@@ -48,6 +70,12 @@ public class Day19 {
         PartProcessor flowBoi = prepareFlows(splinput[0]);
         Stream<Part> parts = prepareParts(splinput[1]);
         return flowBoi.processParts(parts);
+    }
+
+    public static long aoc19a(String input) {
+        String[] splinput = input.split("\r\n\r\n");
+        PartProcessor flowBoi = prepareFlows(splinput[0]);
+        return 0L;
     }
 
     private static Stream<Part> prepareParts(String s) {
@@ -72,9 +100,9 @@ public class Day19 {
     }
 
     private static PartProcessor prepareFlows(String s) {
-        Map<String, Function<Part, String>> map = Arrays.stream(s.split("\r\n"))
+        Map<String, Workflow> map = Arrays.stream(s.split("\r\n"))
                 .map(Day19::flowFromLine)
-                .collect(Collectors.toMap(Workflow::name, Workflow::condition));
+                .collect(Collectors.toMap(Workflow::name, wf -> wf));
         return new PartProcessor(map);
     }
 
@@ -83,47 +111,27 @@ public class Day19 {
         String name = spline[0];
         String[] conditions = spline[1].substring(0, spline[1].length() - 1).split(",");
 
-        Function<Part, String> condition = null;
-        for (int i = conditions.length - 1; i >= 0; i--) {
-            String cLine = conditions[i];
-            if (cLine.contains(">")) {
-                String end = cLine.split(":")[1];
-                cLine = cLine.split(":")[0];
-                Function<Part, String> conditionSoFar = condition;
-                String[] scline = cLine.split(">");
-                condition = switch (scline[0]) {
-                    case "x" ->
-                            (Part part) -> part.x() > Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    case "m" ->
-                            (Part part) -> part.m() > Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    case "a" ->
-                            (Part part) -> part.a() > Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    case "s" ->
-                            (Part part) -> part.s() > Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    default -> throw new IllegalStateException("Unexpected value: " + scline[0]);
-                };
-            } else if (cLine.contains("<")) {
-                String end = cLine.split(":")[1];
-                cLine = cLine.split(":")[0];
-                Function<Part, String> conditionSoFar = condition;
-                String[] scline = cLine.split("<");
-                condition = switch (scline[0]) {
-                    case "x" ->
-                            (Part part) -> part.x() < Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    case "m" ->
-                            (Part part) -> part.m() < Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    case "a" ->
-                            (Part part) -> part.a() < Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    case "s" ->
-                            (Part part) -> part.s() < Integer.parseInt(scline[1]) ? end : conditionSoFar.apply(part);
-                    default -> throw new IllegalStateException("Unexpected value: " + scline[0]);
-                };
-            } else {
-                String finalCLine = cLine;
-                condition = (Part p) -> finalCLine;
+        List<Condition> condList = new ArrayList<>();
+        for (String condition : conditions) {
+            String cLine = condition;
+            boolean greater = cLine.contains(">");
+            if (!greater && !cLine.contains("<")) {
+                condList.add(new Condition(part -> 0, false, 1, cLine));
+                continue;
             }
+            String redir = cLine.split(":")[1];
+            cLine = cLine.split(":")[0];
+            String[] scLine = cLine.split(greater ? ">" : "<");
+            int condValue = Integer.parseInt(scLine[1]);
+            Function<Part, Integer> valueAccessor = switch (scLine[0].trim()) {
+                case "x" -> Part::x;
+                case "m" -> Part::m;
+                case "a" -> Part::a;
+                case "s" -> Part::s;
+                default -> throw new IllegalStateException("Unexpected value: " + scLine[0]);
+            };
+            condList.add(new Condition(valueAccessor, greater, condValue, redir));
         }
-
-        return new Workflow(name, condition);
+        return new Workflow(name, condList);
     }
 }
