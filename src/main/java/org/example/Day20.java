@@ -146,16 +146,20 @@ public class Day20 {
 
     public static long aoc20a(Stream<String> input) {
         Map<String, Module> modMap = input.map(Day20::lineToModule).filter(Objects::nonNull).collect(Collectors.toMap(Module::name, module -> module));
+        modMap.put("rx", new Conjunction("rx", new ArrayList<>()));
         modMap.values().stream()
                 .filter(val -> val instanceof Conjunction)
                 .forEach(con -> modMap.values().stream()
                         .filter(module -> module.outputs.contains(con.name()))
                         .forEach(module -> ((Conjunction) con).addInput(module.name())));
-        long counter = 1;
-        while (!getRoundResult2(modMap)) {
+        long counter = 2;
+        HashMap<String, Long> map = new HashMap<>();
+        long output = getRoundResult2(modMap, counter, map);
+        while (output == 0) {
+            output = getRoundResult2(modMap, counter, map);
             counter++;
         }
-        return counter;
+        return output;
     }
 
     private static long roundsAnalysis(Map<String, int[]> rounds, String roundState) {
@@ -215,7 +219,7 @@ public class Day20 {
         return roundResult;
     }
 
-    private static boolean getRoundResult2(Map<String, Module> modMap) {
+    private static long getRoundResult2(Map<String, Module> modMap, long counter, Map<String, Long> flagCount) {
         Queue<Signal> signals = new ArrayDeque<>();
         signals.add(new Signal("button", L, "broadcaster"));
         while (!signals.isEmpty()) {
@@ -223,8 +227,18 @@ public class Day20 {
             if (sig.pulse() == null) {
                 continue;
             }
-            if (Objects.equals(sig.to(), "rx") && sig.pulse() == L) {
-                return true;
+            for (Map.Entry<String, Pulse> entry : ((Conjunction) modMap.get("dn")).memory.entrySet()) {
+                if (entry.getValue() == H) {
+                    String k = entry.getKey();
+                    if (k != null) {
+                        if (!flagCount.containsKey(k)) {
+                            flagCount.put(k, counter);
+                            if (flagCount.size() == 4) {
+                                return flagCount.values().stream().reduce(1L, Utils::lcm);
+                            }
+                        }
+                    }
+                }
             }
             if (!modMap.containsKey(sig.to())) {
                 continue;
@@ -235,7 +249,7 @@ public class Day20 {
             }
             signals.addAll(mod.processSignal(sig));
         }
-        return false;
+        return 0;
     }
 
     private static String stateStrings(Map<String, Module> modMap) {
